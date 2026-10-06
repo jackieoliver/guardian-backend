@@ -1,0 +1,106 @@
+name: GuardianDesktop
+
+packages:
+  GoogleSignIn:
+    url: https://github.com/google/GoogleSignIn-iOS
+    from: 9.0.0
+  SwiftTerm:
+    url: https://github.com/migueldeicaza/SwiftTerm
+    from: 1.12.0
+
+options:
+  bundleIdPrefix: com.hapticasensorics
+  deploymentTarget:
+    macOS: "15.0"
+  createIntermediateGroups: true
+
+settings:
+  base:
+    PRODUCT_BUNDLE_IDENTIFIER: com.hapticasensorics.guardiandesktop
+    SWIFT_VERSION: 6.0
+    CODE_SIGN_STYLE: Automatic
+    DEVELOPMENT_TEAM: ""
+    GENERATE_INFOPLIST_FILE: YES
+    INFOPLIST_KEY_NSHumanReadableCopyright: ""
+    INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.productivity
+    INFOPLIST_KEY_NSPrincipalClass: NSApplication
+
+targets:
+  GuardianDesktopCore:
+    type: framework
+    platform: macOS
+    sources:
+      - Sources/GuardianDesktop/Data
+      - Sources/GuardianDesktop/AppEnvironment.swift
+      - Sources/GuardianDesktop/ArchiveDataPipeline.swift
+      - Sources/GuardianDesktop/ArchiveModels.swift
+      - Sources/GuardianDesktop/ArchiveTheme.swift
+      - Sources/GuardianDesktop/ArchiveViewModel.swift
+    settings:
+      base:
+        PRODUCT_NAME: GuardianDesktopCore
+        PRODUCT_BUNDLE_IDENTIFIER: com.hapticasensorics.guardiandesktop.core
+        GENERATE_INFOPLIST_FILE: YES
+
+  GuardianDesktop:
+    type: application
+    platform: macOS
+    sources:
+      - Sources/GuardianDesktop/App
+      - Sources/GuardianDesktop/AuthMenuCommands.swift
+      - Sources/GuardianDesktop/DesktopImportRunner.swift
+      - Sources/GuardianDesktop/DesktopImportWorkflow.swift
+      - Sources/GuardianDesktop/Features
+      - Sources/GuardianDesktop/GuardianBackendClient.swift
+      - Sources/GuardianDesktop/GoogleAuthSession.swift
+      - Sources/GuardianDesktop/GuardianDesktopApp.swift
+      - Sources/GuardianDesktop/HelpMenuCommands.swift
+      - Sources/GuardianDesktop/JournalVMConfig.swift
+      - Sources/GuardianDesktop/JournalWorkspace.swift
+      - Sources/GuardianDesktop/MockModeController.swift
+      - Sources/GuardianDesktop/MusicNotation.swift
+      - Sources/GuardianDesktop/SourceInventoryStore.swift
+      - Sources/GuardianDesktop/Shared
+      - Sources/GuardianDesktop/SourceDialogs.swift
+      - Sources/GuardianDesktop/SourceMenuCommands.swift
+      - path: Resources
+    dependencies:
+      - target: GuardianDesktopCore
+      - package: GoogleSignIn
+        product: GoogleSignIn
+      - package: GoogleSignIn
+        product: GoogleSignInSwift
+      - package: SwiftTerm
+        product: SwiftTerm
+    settings:
+      base:
+        PRODUCT_NAME: GuardianDesktop
+        GENERATE_INFOPLIST_FILE: NO
+        INFOPLIST_FILE: Resources/Info.plist
+        CODE_SIGN_ENTITLEMENTS: Resources/GuardianDesktop.entitlements
+    scheme:
+      testTargets:
+        - GuardianDesktopTests
+
+  GuardianDesktopImportCLI:
+    type: tool
+    platform: macOS
+    sources:
+      - Sources/GuardianDesktop/DesktopImportRunner.swift
+      - Sources/GuardianDesktop/DesktopImportWorkflow.swift
+      - Sources/GuardianDesktop/GuardianBackendClient.swift
+      - Sources/GuardianDesktopImportCLI
+    settings:
+      base:
+        PRODUCT_NAME: GuardianDesktopImportCLI
+
+  GuardianDesktopTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - Tests
+    dependencies:
+      - target: GuardianDesktopCore
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
